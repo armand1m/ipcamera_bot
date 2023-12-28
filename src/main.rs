@@ -77,14 +77,14 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
 }
 
 fn get_command(message: &str, bot_name: &str) -> Option<Command> {
-    if !message.starts_with("/") {
+    if !message.starts_with('/') {
         return None;
     }
 
     // splits the bot name from the command, in case it is there
     let mut cmd = message;
     if cmd.ends_with(bot_name) {
-        cmd = cmd.rsplitn(2, '@').skip(1).next().unwrap();
+        cmd = cmd.rsplit_once('@').unwrap().0;
     }
 
     match cmd {
@@ -115,12 +115,9 @@ async fn start_telegram_server() -> Result<(), Box<dyn std::error::Error>> {
                 let command = get_command(data.as_str(), bot_name.as_str());
                 let api = api.clone();
 
-                match command {
-                    Some(Command::XynNow) => {
-                        log::debug!("Triggering {:?} command", Command::XynNow);
-                        send_video(api, message).compat().await?
-                    }
-                    _ => (),
+                if let Some(Command::XynNow) = command {
+                    log::debug!("Triggering {:?} command", Command::XynNow);
+                    send_video(api, message).compat().await?
                 }
             }
         }
