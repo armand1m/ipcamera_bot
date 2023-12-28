@@ -6,11 +6,11 @@ mod mp4;
 use chrono::{DateTime, Local};
 use retina::client::Transport;
 
-use url::Url;
 use futures::StreamExt;
 use std::env;
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 use std::str::FromStr;
+use url::Url;
 
 use telegram_bot::{prelude::*, InputFileUpload};
 use telegram_bot::{Api, Message, MessageKind, UpdateKind};
@@ -39,7 +39,8 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
     let now: DateTime<Local> = Local::now();
     let filename = format!("recording_{}.mp4", now);
     let out = PathBuf::from(Path::new(&filename));
-    api.send(message.text_reply("Recording 5 sec video..")).await?;
+    api.send(message.text_reply("Recording 5 sec video.."))
+        .await?;
 
     let result = mp4::run(Opts {
         src,
@@ -51,15 +52,21 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
         duration: Some(5),
         transport: Transport::from_str("tcp")?,
         out: out.clone(),
-    }).compat().await;
-    
+    })
+    .compat()
+    .await;
+
     match result {
-        Ok(()) => { 
+        Ok(()) => {
             let reply = InputFileUpload::with_path(out.as_os_str().to_str().unwrap());
 
             let _ = api.send(message.video_reply(reply)).compat().await;
 
-            let _ = tokio::fs::remove_file(out).compat().await;
+            let file_exists = tokio::fs::try_exists(out.clone()).compat().await?;
+
+            if file_exists {
+                let _ = tokio::fs::remove_file(out).compat().await;
+            }
         }
         Err(err) => {
             log::error!("{:?}", err);
