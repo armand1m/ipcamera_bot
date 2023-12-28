@@ -1,0 +1,11 @@
+app = "xyncam-bot"
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[env]
+  TELEGRAM_BOT_NAME="xyncam-bot"
+  RUST_LOG="xyncam_bot"
+
+[experimental]
+  auto_rollback = true
