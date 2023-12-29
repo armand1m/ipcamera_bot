@@ -3,5 +3,4 @@ Dockerfile
 .dockerignore
 .git
 .gitignore
-fly.toml
 docker-compose.yml
