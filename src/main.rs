@@ -34,8 +34,6 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
         password: Some(password),
     };
 
-    log::error!("{:?}", src);
-
     let now: DateTime<Local> = Local::now();
     let filename = format!("recording_{}.mp4", now);
     let out = PathBuf::from(Path::new(&filename));
@@ -110,6 +108,13 @@ async fn start_telegram_server() -> Result<(), Box<dyn std::error::Error>> {
     // tokio-compat-02 package to allow different libraries using
     // different tokio runtimes to work in the same process
     while let Some(update) = stream.next().compat().await {
+        if let Err(err) = update {
+            log::error!("Intercepting error from stream");
+            log::error!("{:?}", err);
+
+            return Err(Box::new(err));
+        };
+
         if let UpdateKind::Message(message) = update?.kind {
             if let MessageKind::Text { ref data, .. } = message.kind {
                 let command = get_command(data.as_str(), bot_name.as_str());
