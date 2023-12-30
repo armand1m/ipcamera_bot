@@ -37,11 +37,14 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
     let now: DateTime<Local> = Local::now();
     let filename = format!("recording_{}.mp4", now);
     let out = PathBuf::from(Path::new(&filename));
-    api.send(message.text_reply("Recording 5 sec video.."))
+
+    let feedback_message = api
+        .send(message.text_reply("Recording 5 sec video.."))
         .await?;
 
     let result = mp4::run(Opts {
         src,
+        out: out.clone(),
         initial_timestamp: retina::client::InitialTimestampPolicy::Default,
         no_video: false,
         no_audio: true,
@@ -49,13 +52,14 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
         teardown: retina::client::TeardownPolicy::Always,
         duration: Some(5),
         transport: Transport::from_str("udp")?,
-        out: out.clone(),
     })
     .compat()
     .await;
 
     match result {
         Ok(()) => {
+            let edited_message = api.send(feedback_message.edit_text("Recording done. Uploading.")).await?;
+
             let reply = InputFileUpload::with_path(out.as_os_str().to_str().unwrap());
 
             let _ = api.send(message.video_reply(reply)).compat().await;
@@ -65,10 +69,15 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
             if file_exists {
                 let _ = tokio::fs::remove_file(out).compat().await;
             }
+
+            api.send(edited_message.delete()).await?;
         }
 
         Err(err) => {
+            log::error!("Recording has failed. Reason in the next message.");
             log::error!("{:?}", err);
+
+            api.send(feedback_message.edit_text("Recording has failed. Please try again later.")).await?;
         }
     }
 
