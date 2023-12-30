@@ -45,7 +45,7 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
         initial_timestamp: retina::client::InitialTimestampPolicy::Default,
         no_video: false,
         no_audio: true,
-        allow_loss: false,
+        allow_loss: true,
         teardown: retina::client::TeardownPolicy::Always,
         duration: Some(5),
         transport: Transport::from_str("udp")?,
