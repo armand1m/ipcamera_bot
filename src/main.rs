@@ -46,9 +46,9 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
         no_video: false,
         no_audio: true,
         allow_loss: false,
-        teardown: retina::client::TeardownPolicy::Auto,
+        teardown: retina::client::TeardownPolicy::Always,
         duration: Some(5),
-        transport: Transport::from_str("tcp")?,
+        transport: Transport::from_str("udp")?,
         out: out.clone(),
     })
     .compat()
@@ -66,6 +66,7 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
                 let _ = tokio::fs::remove_file(out).compat().await;
             }
         }
+
         Err(err) => {
             log::error!("{:?}", err);
         }
