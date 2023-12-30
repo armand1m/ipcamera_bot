@@ -58,7 +58,9 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
 
     match result {
         Ok(()) => {
-            let edited_message = api.send(feedback_message.edit_text("Recording done. Uploading.")).await?;
+            let edited_message = api
+                .send(feedback_message.edit_text("Recording done. Uploading."))
+                .await?;
 
             let reply = InputFileUpload::with_path(out.as_os_str().to_str().unwrap());
 
@@ -77,7 +79,8 @@ async fn send_video(api: Api, message: Message) -> Result<(), Box<dyn std::error
             log::error!("Recording has failed. Reason in the next message.");
             log::error!("{:?}", err);
 
-            api.send(feedback_message.edit_text("Recording has failed. Please try again later.")).await?;
+            api.send(feedback_message.edit_text("Recording has failed. Please try again later."))
+                .await?;
         }
     }
 
