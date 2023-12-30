@@ -36,13 +36,24 @@ pub async fn send_video_command(
     let recorder_options = Opts {
         src,
         out: out.clone(),
-        initial_timestamp: retina::client::InitialTimestampPolicy::Default,
         no_video: false,
         no_audio: true,
-        allow_loss: true,
-        teardown: retina::client::TeardownPolicy::Always,
         duration: Some(5),
+        initial_timestamp: retina::client::InitialTimestampPolicy::Default,
+        /*
+         * During development and tracing some "Invalid RTSP message" errors,
+         * I've found the following log warn message from the retina package:
+         *
+         * 2023-12-30_09:29:40.74555 [2023-12-30T09:29:40Z WARN  retina::client]
+         * Connecting via TCP to known-broken RTSP server "TP-LINK Streaming Media v2015.05.12".
+         * See <https://github.com/scottlamb/retina/issues/17>.
+         * Consider using UDP instead!
+         *
+         * This is why all the settings below are being set as such.
+         */
         transport: Transport::from_str("udp")?,
+        teardown: retina::client::TeardownPolicy::Always,
+        allow_loss: true,
     };
 
     let mp4_recorder_result = mp4::run(recorder_options).compat().await;
