@@ -119,10 +119,10 @@ async fn start_telegram_server() -> Result<(), Box<dyn std::error::Error>> {
     // different tokio runtimes to work in the same process
     while let Some(update) = stream.next().compat().await {
         if let Err(err) = update {
-            log::error!("Intercepting error from stream");
+            log::error!("Intercepting error from stream. Panicking the process.");
             log::error!("{:?}", err);
 
-            return Err(Box::new(err));
+            panic!("{:?}", err);
         };
 
         if let UpdateKind::Message(message) = update?.kind {
