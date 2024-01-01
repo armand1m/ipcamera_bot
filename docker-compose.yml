@@ -1,0 +1,12 @@
+version: '3.1'
+services:
+  app:
+    build:
+      context: .
+    env_file:
+      - .env
+    network_mode: host
+    restart: always
+
+networks:
+  overlay:
