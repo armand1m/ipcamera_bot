@@ -35,7 +35,7 @@ Setup:
 
     ```sh
     cargo build --release
-    ./target/release/ipcamera-bot
+    ./target/release/ipcamera_bot
     ```
 
 ## Running with Docker
@@ -112,7 +112,7 @@ ssh root@<phone-ip> -p 8022
 
 Use the password you've setup with `passwd`. You can get the ip with `ifconfig`.
 
-## Setup ipcamera-bot environment
+## Setup ipcamera_bot environment
 
 Make sure you have `git` and `rust` installed on your termux:
 
@@ -143,9 +143,9 @@ cd ~/Projects/ipcamera_bot
 cargo build --release
 ```
 
-And now you should have a release build in `~/Projects/ipcamera_bot/target/release/ipcamera-bot`
+And now you should have a release build in `~/Projects/ipcamera_bot/target/release/ipcamera_bot`
 
-## Setup ipcamera-bot on runit
+## Setup ipcamera_bot on runit
 
 Run the following script to setup the service folder and logging:
 
@@ -167,7 +167,7 @@ export PKG=ipcamera_bot
 cat > $SVDIR/$PKG/run <<EOL
 #!/data/data/com.termux/files/usr/bin/sh
 cd /data/data/com.termux/files/home/Projects/ipcamera_bot
-exec ./target/release/ipcamera-bot 2>&1
+exec ./target/release/ipcamera_bot 2>&1
 EOL
 chmod +x $SVDIR/$PKG/run
 ```
@@ -191,7 +191,7 @@ You should be able to read the logs with:
 tail -f $LOGDIR/sv/ipcamera_bot/current
 ```
 
-`runit` by default sets up log rotation with up to 10 files with max 1000k each.
+`runit` by default sets up log rotation with up to 10 files with max 1mb each.
 Once `current` reached the max size, it gets renamed and a new `current` is created.
 
 ### Starting up on boot
