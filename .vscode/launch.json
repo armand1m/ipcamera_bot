@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'rodosol-telegram-bot'",
+            "name": "Debug executable 'ipcamera_bot'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=rodosol-telegram-bot",
-                    "--package=rodosol-telegram-bot"
+                    "--bin=ipcamera_bot",
+                    "--package=ipcamera_bot"
                 ],
                 "filter": {
-                    "name": "rodosol-telegram-bot",
+                    "name": "ipcamera_bot",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'rodosol-telegram-bot'",
+            "name": "Debug unit tests in executable 'ipcamera_bot'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=rodosol-telegram-bot",
-                    "--package=rodosol-telegram-bot"
+                    "--bin=ipcamera_bot",
+                    "--package=ipcamera_bot"
                 ],
                 "filter": {
-                    "name": "rodosol-telegram-bot",
+                    "name": "ipcamera_bot",
                     "kind": "bin"
                 }
             },
