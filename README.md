@@ -112,6 +112,12 @@ ssh root@<phone-ip> -p 8022
 
 Use the password you've setup with `passwd`. You can get the ip with `ifconfig`.
 
+### Acquire wake lock
+
+To avoid the Android OS from sleeping your Termux process, use the `termux-wake-lock` command to prompt a wake lock for it.
+
+You can also do it from Android GUI in your notification panel.
+
 ## Setup ipcamera_bot environment
 
 Make sure you have `git` and `rust` installed on your termux:
