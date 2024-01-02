@@ -150,12 +150,13 @@ And now you should have a release build in `~/Projects/ipcamera_bot/target/relea
 Run the `setup-ipcamera-svc-logger.sh` script to setup the `runit` logger:
 
 ```sh
-./scripts/termux-setup/setup-ipcamera-svc-logger.sh
+~/Projects/ipcamera_bot/scripts/termux-setup/setup-ipcamera-svc-logger.sh
 ```
 
 Run the `setup-ipcamera-svc-runner.sh` script to setup the `runit` runner:
+
 ```sh
-./scripts/termux-setup/setup-ipcamera-svc-runner.sh
+~/Projects/ipcamera_bot/scripts/termux-setup/setup-ipcamera-svc-runner.sh
 ```
 
 You can check if it is up with:
@@ -175,6 +176,12 @@ You should be able to read the logs with:
 
 ```sh
 tail -f $LOGDIR/sv/ipcamera_bot/current
+```
+
+Terminate the server with:
+
+```sh
+sv down ipcamera_bot
 ```
 
 `runit` by default sets up log rotation with up to 10 files with max 1mb each.
