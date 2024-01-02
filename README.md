@@ -147,35 +147,15 @@ And now you should have a release build in `~/Projects/ipcamera_bot/target/relea
 
 ## Setup ipcamera_bot on runit
 
-Run the following script to setup the service folder and logging:
+Run the `setup-ipcamera-svc-logger.sh` script to setup the `runit` logger:
 
 ```sh
-export PKG=ipcamera_bot
-
-mkdir -p $SVDIR/$PKG/log
-cat > $SVDIR/$PKG/log/run <<EOL
-#!/data/data/com.termux/files/usr/bin/sh
-exec svlogd -v -tt "$LOGDIR/sv/ipcamera_bot"
-EOL
-chmod +x $SVDIR/$PKG/log/run
+./scripts/termux-setup/setup-ipcamera-svc-logger.sh
 ```
 
-Now run the following script to create the runner script:
-
+Run the `setup-ipcamera-svc-runner.sh` script to setup the `runit` runner:
 ```sh
-export PKG=ipcamera_bot
-cat > $SVDIR/$PKG/run <<EOL
-#!/data/data/com.termux/files/usr/bin/sh
-cd /data/data/com.termux/files/home/Projects/ipcamera_bot
-exec ./target/release/ipcamera_bot 2>&1
-EOL
-chmod +x $SVDIR/$PKG/run
-```
-
-You should be all set to start the service now:
-
-```sh
-sv up ipcamera_bot
+./scripts/termux-setup/setup-ipcamera-svc-runner.sh
 ```
 
 You can check if it is up with:
@@ -183,6 +163,12 @@ You can check if it is up with:
 ```sh
 sv status ipcamera_bot
 # run: ipcamera_bot: (pid 29368) 1428s, normally down; run: log: (pid 5798) 11062s
+``` 
+
+You should be all set to start the service now:
+
+```sh
+sv up ipcamera_bot
 ```
 
 You should be able to read the logs with:
