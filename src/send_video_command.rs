@@ -32,8 +32,8 @@ fn get_output() -> PathBuf {
 }
 
 fn get_recording_options(
-    src: Source,
-    out: PathBuf,
+    source: Source,
+    output: PathBuf,
 ) -> Result<Mp4RecorderOptions, Box<dyn std::error::Error>> {
     let no_audio_str = env::var("RECORD_NO_AUDIO").unwrap_or("true".to_string());
     let no_video_str = env::var("RECORD_NO_VIDEO").unwrap_or("false".to_string());
@@ -44,8 +44,8 @@ fn get_recording_options(
     let duration = Some(duration_str.parse::<u64>().unwrap());
 
     Ok(Mp4RecorderOptions {
-        src,
-        out,
+        source,
+        output,
         no_video,
         no_audio,
         duration,
@@ -76,13 +76,17 @@ pub async fn send_video_command(
     api: Api,
     command_msg: Message,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let feedback_msg = api
-        .send(command_msg.text_reply("Recording 5 sec video.."))
-        .await?;
-
     let source = get_source()?;
     let output = get_output();
     let options = get_recording_options(source, output.clone())?;
+
+    let feedback_msg = api
+        .send(command_msg.text_reply(format!(
+            "Recording {} sec video..",
+            options.duration.unwrap()
+        )))
+        .await?;
+
     let recording_result = mp4::start_recording(options).compat().await;
 
     if let Err(recorder_error) = recording_result {
