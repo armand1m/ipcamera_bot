@@ -78,8 +78,8 @@ async fn copy<'a>(
 
     loop {
         tokio::select! {
-            pkt = session.next() => {
-                match pkt.ok_or_else(|| anyhow!("EOF"))?? {
+            packet = session.next() => {
+                match packet.ok_or_else(|| anyhow!("EOF"))?? {
                     CodecItem::VideoFrame(frame) => {
                         let stream = &session.streams()[frame.stream_id()];
                         let start_ctx = *frame.start_ctx();
