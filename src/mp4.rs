@@ -67,7 +67,7 @@ pub struct Mp4RecorderOptions {
 async fn copy<'a>(
     options: &'a Mp4RecorderOptions,
     session: &'a mut Demuxed,
-    mp4: &'a mut Mp4Writer<File>,
+    mp4_writer: &'a mut Mp4Writer<File>,
 ) -> Result<(), Error> {
     let sleep = match options.duration {
         Some(secs) => Either::Left(sleep(Duration::from_secs(secs))),
@@ -83,12 +83,12 @@ async fn copy<'a>(
                     CodecItem::VideoFrame(frame) => {
                         let stream = &session.streams()[frame.stream_id()];
                         let start_ctx = *frame.start_ctx();
-                        mp4.video(stream, frame).await.with_context(
+                        mp4_writer.video(stream, frame).await.with_context(
                             || format!("Error processing video frame starting with {start_ctx}"))?;
                     },
                     CodecItem::AudioFrame(frame) => {
                         let ctx = *frame.ctx();
-                        mp4.audio(frame).await.with_context(
+                        mp4_writer.audio(frame).await.with_context(
                             || format!("Error processing audio frame, {ctx}"))?;
                     },
                     CodecItem::Rtcp(rtcp) => {

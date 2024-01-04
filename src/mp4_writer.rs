@@ -484,7 +484,7 @@ impl<W: AsyncWrite + AsyncSeek + Send + Unpin> Mp4Writer<W> {
         stream: &retina::client::Stream,
         frame: retina::codec::VideoFrame,
     ) -> Result<(), Error> {
-        log::debug!(
+        debug!(
             "{}: {}-byte video frame",
             &frame.timestamp(),
             frame.data().remaining(),
@@ -537,7 +537,7 @@ impl<W: AsyncWrite + AsyncSeek + Send + Unpin> Mp4Writer<W> {
     }
 
     pub async fn audio(&mut self, frame: retina::codec::AudioFrame) -> Result<(), Error> {
-        log::debug!(
+        debug!(
             "{}: {}-byte audio frame",
             frame.timestamp(),
             frame.data().remaining()
