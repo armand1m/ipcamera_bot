@@ -1,0 +1,24 @@
+{
+    "cameras": [
+        {
+            "name": "camera1",
+            "url": "rtsp://<ip-address-1>/stream1",
+            "username": "johndoe",
+            "password": "nicepass",
+            "noAudio": true,
+            "noVideo": false,
+            "transport": "udp",
+            "duration": 5
+        },
+        {
+            "name": "camera2",
+            "url": "rtsp://<ip-address-2>/stream1",
+            "username": "johndoe",
+            "password": "notsonicepass",
+            "noAudio": true,
+            "noVideo": false,
+            "transport": "udp",
+            "duration": 5
+        }
+    ]
+}

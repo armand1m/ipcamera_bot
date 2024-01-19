@@ -6,12 +6,9 @@ Written in Rust, made to be deployed locally in your network using an old Androi
 
 ## Commands available
 
-- [x] `/get_live`: retrieves 5 seconds of live record from an IP Camera using an RTSP protocol.
-    - [x] Camera for this command must be setup through the `CAMERA_URL` _(rtsp stream url)_, `CAMERA_USERNAME` and `CAMERA_PASSWORD` envrionment variables.
+- [x] `/get_live`: retrieves 5 seconds of live record from one or multiple IP Cameras using the RTSP protocol.
+    - [x] Cameras and recording settings can be setup in a JSON file that can be found with the absolute path specified in the `CAMERA_CONFIG_PATH` environment variable.
     - [x] This command can be renamed with the `GET_RECORD_COMMAND` environment variable (default: `/get_live`)
-    - [x] This command can fetch different durations with the `RECORD_DURATION_SECONDS` environment variable (default: 5)
-    - [x] This command can fetch a recording without video using the `RECORD_NO_VIDEO` environment variable set to `true` (default: `false`)
-    - [x] This command can fetch a recording without audio using the `RECORD_NO_AUDIO` environment variable set to `true` (default: `true`)
 
 You may also send these commands directly to the bot instead of adding it to a chat.
 
@@ -25,8 +22,10 @@ Environment:
 Setup:
 
  - Clone this repository: `git clone https://github.com/armand1m/ipcamera_bot`
+ - Make your `camera_config.json` file: `cp example_camera_config.json camera_config.json` 
+ - Edit the `camera_config.json` to correspond to your camera desired setup.
  - Make your `.env.`: `cp .env-example .env`
- - Edit the `.env` accordingly. Setup your bot father token, ip camera url, username, password, and properties.
+ - Edit the `.env` accordingly. Setup your bot father token, ip camera url, username, password, and path to the camera config json file.
 
  Now you should be good to get started with.
 

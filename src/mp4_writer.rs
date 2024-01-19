@@ -46,7 +46,10 @@ macro_rules! write_box {
 /// Writes `.mp4` data to a sink.
 /// See module-level documentation for details.
 pub struct Mp4Writer<W: AsyncWrite + AsyncSeek + Send + Unpin> {
+    /// media data box start
     mdat_start: u32,
+
+    /// media data box position
     mdat_pos: u32,
     video_params: Vec<VideoParameters>,
 
@@ -101,7 +104,10 @@ impl TrakTracker {
         }
         self.samples += 1;
         if self.next_pos != Some(byte_pos)
-            || self.chunks.last().map(|c| c.sample_description_index)
+            || self
+                .chunks
+                .last()
+                .map(|chunk| chunk.sample_description_index)
                 != Some(sample_description_index)
         {
             self.chunks.push(Chunk {
@@ -154,11 +160,11 @@ impl TrakTracker {
             let mut prev_sample_number = 1;
             let mut chunk_number = 1;
             if !self.chunks.is_empty() {
-                for c in &self.chunks[1..] {
+                for chunk in &self.chunks[1..] {
                     buf.put_u32(chunk_number);
-                    buf.put_u32(c.first_sample_number - prev_sample_number);
-                    buf.put_u32(c.sample_description_index);
-                    prev_sample_number = c.first_sample_number;
+                    buf.put_u32(chunk.first_sample_number - prev_sample_number);
+                    buf.put_u32(chunk.sample_description_index);
+                    prev_sample_number = chunk.first_sample_number;
                     chunk_number += 1;
                 }
                 buf.put_u32(chunk_number);
@@ -235,8 +241,8 @@ impl<W: AsyncWrite + AsyncSeek + Send + Unpin> Mp4Writer<W> {
                 buf.put_u16(0x0100); // volume
                 buf.put_u16(0); // reserved
                 buf.put_u64(0); // reserved
-                for v in &[0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000] {
-                    buf.put_u32(*v); // matrix
+                for value in &[0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000] {
+                    buf.put_u32(*value); // matrix
                 }
                 for _ in 0..6 {
                     buf.put_u32(0); // pre_defined
@@ -274,14 +280,14 @@ impl<W: AsyncWrite + AsyncSeek + Send + Unpin> Mp4Writer<W> {
                 buf.put_u16(0); // alternate_group
                 buf.put_u16(0); // volume
                 buf.put_u16(0); // reserved
-                for v in &[0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000] {
-                    buf.put_u32(*v); // matrix
+                for value in &[0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000] {
+                    buf.put_u32(*value); // matrix
                 }
-                let dims = self.video_params.iter().fold((0, 0), |prev_dims, p| {
-                    let dims = p.pixel_dimensions();
+                let dims = self.video_params.iter().fold((0, 0), |prev_dims, params| {
+                    let dimensions = params.pixel_dimensions();
                     (
-                        std::cmp::max(prev_dims.0, dims.0),
-                        std::cmp::max(prev_dims.1, dims.1),
+                        std::cmp::max(prev_dims.0, dimensions.0),
+                        std::cmp::max(prev_dims.1, dimensions.1),
                     )
                 });
                 let width = u32::from(u16::try_from(dims.0)?) << 16;
@@ -327,16 +333,16 @@ impl<W: AsyncWrite + AsyncSeek + Send + Unpin> Mp4Writer<W> {
                         write_box!(buf, b"stsd", {
                             buf.put_u32(0); // version
                             buf.put_u32(u32::try_from(self.video_params.len())?); // entry_count
-                            for p in &self.video_params {
-                                self.write_video_sample_entry(buf, p)?;
+                            for params in &self.video_params {
+                                self.write_video_sample_entry(buf, params)?;
                             }
                         });
                         self.video_trak.write_common_stbl_parts(buf)?;
                         write_box!(buf, b"stss", {
                             buf.put_u32(0); // version
                             buf.put_u32(u32::try_from(self.video_sync_sample_nums.len())?);
-                            for n in &self.video_sync_sample_nums {
-                                buf.put_u32(*n);
+                            for sample_num in &self.video_sync_sample_nums {
+                                buf.put_u32(*sample_num);
                             }
                         });
                     });
@@ -364,8 +370,8 @@ impl<W: AsyncWrite + AsyncSeek + Send + Unpin> Mp4Writer<W> {
                 buf.put_u16(0); // alternate_group
                 buf.put_u16(0); // volume
                 buf.put_u16(0); // reserved
-                for v in &[0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000] {
-                    buf.put_u32(*v); // matrix
+                for value in &[0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000] {
+                    buf.put_u32(*value); // matrix
                 }
                 buf.put_u32(0); // width
                 buf.put_u32(0); // height

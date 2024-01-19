@@ -1,8 +1,5 @@
 use anyhow::{anyhow, bail, Context, Error};
-use futures::{
-    future::{pending, Either},
-    StreamExt,
-};
+use futures::StreamExt;
 use log::{debug, error, info, warn};
 use retina::{
     client::{
@@ -13,14 +10,17 @@ use retina::{
     rtcp::PacketRef,
 };
 
+use futures::future::Either;
+use std::future::Pending;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::{num::NonZeroU32, time::Duration};
+use tokio::time::Sleep;
 use tokio::{fs::File, time::sleep};
 
 use crate::mp4_writer::Mp4Writer;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Source {
     /// `rtsp://` URL to connect to.
     pub(crate) url: url::Url,
@@ -32,6 +32,7 @@ pub struct Source {
     pub(crate) password: String,
 }
 
+#[derive(Clone)]
 pub struct Mp4RecorderOptions {
     pub(crate) source: Source,
 
@@ -52,7 +53,7 @@ pub struct Mp4RecorderOptions {
     pub(crate) teardown: TeardownPolicy,
 
     /// Duration after which to exit automatically, in seconds.
-    pub(crate) duration: Option<u64>,
+    pub(crate) duration: u64,
 
     /// The transport to use: `tcp` or `udp` (experimental).
     ///
@@ -69,10 +70,8 @@ async fn copy<'a>(
     session: &'a mut Demuxed,
     mp4_writer: &'a mut Mp4Writer<File>,
 ) -> Result<(), Error> {
-    let sleep = match options.duration {
-        Some(secs) => Either::Left(sleep(Duration::from_secs(secs))),
-        None => Either::Right(pending()),
-    };
+    let sleep: Either<Sleep, Pending<()>> =
+        Either::Left(sleep(Duration::from_secs(options.duration)));
 
     tokio::pin!(sleep);
 
@@ -107,7 +106,7 @@ async fn copy<'a>(
                 };
             },
             _ = &mut sleep => {
-                info!("Stopping after {} seconds", options.duration.unwrap());
+                info!("Stopping after {} seconds", options.duration);
                 break;
             },
         }

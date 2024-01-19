@@ -63,7 +63,12 @@ pub async fn start_telegram_server() -> Result<(), Box<dyn std::error::Error>> {
 
                 if let Some(Command::GetRecordNow) = command {
                     log::debug!("Triggering {:?} command", Command::GetRecordNow);
-                    send_video_command(api, message).compat().await?
+                    let result = send_video_command(api, message).compat().await;
+
+                    if let Err(err) = result {
+                        log::error!("{:?}", err);
+                        panic!("Failed to reply send video command. Panicking server so that a reboot happens.");
+                    }
                 }
             }
         }
